@@ -38,6 +38,12 @@ public class StatisticServiceImpl implements StatisticService {
         LocalDateTime endTime = parseTimeParam(end);
         List<StatisticViewDto> dtos;
 
+        /*if (unique) {
+            dtos = statisticRepository.findUniqueStatistic(startTime, endTime, uris);
+        } else {
+            dtos = statisticRepository.findStatistic(startTime, endTime, uris);
+        }*/
+
         if (uris != null) {
             if (unique) {
                 dtos = statisticRepository.findAllStatisticsByTimeAndListOfUrisAndUniqueIp(startTime, endTime, uris);
@@ -52,6 +58,10 @@ public class StatisticServiceImpl implements StatisticService {
         log.info("Выполнение сбора статистики");
         return dtos;
     }
+
+/*        log.info("Выполнение сбора статистики");
+        return dtos;
+    }*/
 
     private LocalDateTime parseTimeParam(String time) {
         try {
