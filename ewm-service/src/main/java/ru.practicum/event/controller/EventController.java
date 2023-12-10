@@ -100,7 +100,7 @@ public class EventController {
                                                HttpServletRequest request) {
         log.info("----------------------------------------------------------");
         log.info("                                                          ");
-        log.info ("request.getRemoteAddr() = " + request.getRemoteAddr());
+        log.info("request.getRemoteAddr() = " + request.getRemoteAddr());
         StatisticInDto statisticInDto = new StatisticInDto(SERVICE_ID, request.getRequestURI(), request.getRemoteAddr(),
                 LocalDateTime.now());
         log.info("statisticInDto = " + statisticInDto);

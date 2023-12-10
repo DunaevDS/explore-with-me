@@ -33,7 +33,7 @@ public class EventStatService {
     public Map<Long, Long> getEventsViews(List<Long> events) {
         log.info("");
         log.info("заходим в getEventsViews ");
-        log.info ("events = " + events);
+        log.info("events = " + events);
         List<StatisticViewDto> stats;
         Map<Long, Long> eventsViews = new HashMap<>();
         List<String> uris = new ArrayList<>();
@@ -43,7 +43,7 @@ public class EventStatService {
         }
         for (Long id : events) {
             uris.add(EVENT_URI + id);
-            log.info ("добавление в uris записи " + EVENT_URI + id);
+            log.info("добавление в uris записи " + EVENT_URI + id);
         }
 
         StatisticRequestDto requestDto = new StatisticRequestDto();
