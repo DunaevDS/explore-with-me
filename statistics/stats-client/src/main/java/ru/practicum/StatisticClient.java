@@ -1,5 +1,6 @@
 package ru.practicum;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -12,6 +13,7 @@ import ru.practicum.dto.StatisticRequestDto;
 
 import java.util.Map;
 
+@Slf4j
 @Service
 public class StatisticClient extends BaseClient {
 
@@ -26,6 +28,9 @@ public class StatisticClient extends BaseClient {
     }
 
     public ResponseEntity<Object> postHit(StatisticInDto inDto) {
+        log.info("зашли в posthit");
+        log.info("inDto = " + inDto);
+        log.info("вышли из posthit");
         return post("/hit", inDto);
     }
 

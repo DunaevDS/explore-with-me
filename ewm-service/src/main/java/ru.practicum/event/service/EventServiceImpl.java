@@ -276,10 +276,16 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto findPublishedEventById(Long eventId, HttpServletRequest request) {
+        log.info("");
+        log.info("зашли в findPublishedEventById");
         Map<Long, Long> views = eventStatService.getEventsViews(List.of(eventId));
+        log.info("views в findPublishedEventById = " + views);
         Event event = eventRepository.findByIdAndState(eventId, EventState.PUBLISHED)
                 .orElseThrow(() -> new EventNotFoundException("Опубликованного события с указанным id не найдено"));
         log.info("Выполнен публичный поиск опубликованного события с id {}", eventId);
+        log.info("на выходе event = " + event);
+        log.info("на выходе views = " + views);
+        log.info("вышли из findPublishedEventById");
         return EventMapper.toEventFullDtoWithViews(event, views);
     }
 

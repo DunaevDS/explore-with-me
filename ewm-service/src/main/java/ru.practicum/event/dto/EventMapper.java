@@ -1,5 +1,6 @@
 package ru.practicum.event.dto;
 
+import lombok.extern.slf4j.Slf4j;
 import ru.practicum.category.dto.CategoryMapper;
 import ru.practicum.category.model.Category;
 import ru.practicum.event.model.Event;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 import static ru.practicum.constant.Constant.FORMATTER;
 
+@Slf4j
 public class EventMapper {
 
     public static Event toNewEvent(NewEventDto newEventDto, User user, Category category) {
@@ -76,6 +78,8 @@ public class EventMapper {
     }
 
     public static EventFullDto toEventFullDtoWithViews(Event event, Map<Long, Long> eventViews) {
+        log.info("");
+        log.info("Зашли в toEventFullDtoWithViews");
         EventFullDto fullDto = EventFullDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
@@ -96,6 +100,8 @@ public class EventMapper {
         if (event.getPublishedOn() != null) {
             fullDto.setPublishedOn(event.getPublishedOn().format(FORMATTER));
         }
+        log.info("EventFullDto = " + fullDto);
+        log.info("Вышли из toEventFullDtoWithViews");
         return fullDto;
     }
 

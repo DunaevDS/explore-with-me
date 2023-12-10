@@ -1,6 +1,7 @@
 package ru.practicum.event.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -22,6 +23,7 @@ import static ru.practicum.constant.Constant.SERVICE_ID;
 import static ru.practicum.constant.Constant.TIME_FORMAT;
 
 @Validated
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class EventController {
@@ -96,8 +98,12 @@ public class EventController {
     @GetMapping("/events/{id}")
     public EventFullDto findPublishedEventById(@PathVariable Long id,
                                                HttpServletRequest request) {
+        log.info("----------------------------------------------------------");
+        log.info("                                                          ");
+        log.info ("request.getRemoteAddr() = " + request.getRemoteAddr());
         StatisticInDto statisticInDto = new StatisticInDto(SERVICE_ID, request.getRequestURI(), request.getRemoteAddr(),
                 LocalDateTime.now());
+        log.info("statisticInDto = " + statisticInDto);
         statisticClient.postHit(statisticInDto);
         return eventService.findPublishedEventById(id, request);
     }
