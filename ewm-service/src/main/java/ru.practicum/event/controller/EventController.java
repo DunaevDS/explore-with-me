@@ -98,7 +98,6 @@ public class EventController {
     @GetMapping("/events/{id}")
     public EventFullDto findPublishedEventById(@PathVariable Long id,
                                                HttpServletRequest request) {
-        log.info("----------------------------------------------------------");
         log.info("                                                          ");
         log.info("request.getRemoteAddr() = " + request.getRemoteAddr());
         StatisticInDto statisticInDto = new StatisticInDto(SERVICE_ID, request.getRequestURI(), request.getRemoteAddr(),
