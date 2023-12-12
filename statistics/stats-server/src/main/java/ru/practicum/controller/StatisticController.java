@@ -10,7 +10,6 @@ import ru.practicum.service.StatisticService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Validated
@@ -32,7 +31,6 @@ public class StatisticController {
                                                 @RequestParam(required = false) List<String> uris,
                                                 @RequestParam(value = "unique", defaultValue = "false") String unique) {
         Boolean uniqueParam = Boolean.valueOf(unique);
-
         return statisticService.getStatistic(start, end, uris, uniqueParam);
     }
 }
