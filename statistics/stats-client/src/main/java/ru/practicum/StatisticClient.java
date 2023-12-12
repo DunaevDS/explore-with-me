@@ -28,9 +28,6 @@ public class StatisticClient extends BaseClient {
     }
 
     public ResponseEntity<Object> postHit(StatisticInDto inDto) {
-        log.info("зашли в posthit");
-        log.info("inDto = " + inDto);
-        log.info("вышли из posthit");
         return post("/hit", inDto);
     }
 

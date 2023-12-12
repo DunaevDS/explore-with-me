@@ -38,6 +38,11 @@ public class StatisticServiceImpl implements StatisticService {
         LocalDateTime endTime = parseTimeParam(end);
         List<StatisticViewDto> dtos;
 
+        if (startTime.isAfter(endTime)) {
+            throw new StatisticValidationException(
+                    String.format("Старт не может быть позже конца : старт = %s, конец = %s", start, end));
+        }
+
         if (uris != null) {
             if (unique) {
                 dtos = statisticRepository.findAllStatisticsByTimeAndListOfUrisAndUniqueIp(startTime, endTime, uris);
@@ -55,6 +60,7 @@ public class StatisticServiceImpl implements StatisticService {
 
     private LocalDateTime parseTimeParam(String time) {
         try {
+            log.info("Time = " + LocalDateTime.parse(time, DateTimeFormatter.ofPattern(TIME_FORMAT)));
             return LocalDateTime.parse(time, DateTimeFormatter.ofPattern(TIME_FORMAT));
         } catch (DateTimeParseException e) {
             throw new StatisticValidationException("Передан некорректный формат времени");

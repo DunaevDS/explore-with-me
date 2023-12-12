@@ -10,6 +10,7 @@ import ru.practicum.service.StatisticService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Validated
@@ -26,11 +27,12 @@ public class StatisticController {
     }
 
     @GetMapping("/stats")
-    public List<StatisticViewDto> getStatistics(@NotEmpty @RequestParam String start,
-                                                @NotEmpty @RequestParam String end,
+    public List<StatisticViewDto> getStatistics(@NotNull @NotEmpty @RequestParam String start,
+                                                @NotNull @NotEmpty @RequestParam String end,
                                                 @RequestParam(required = false) List<String> uris,
                                                 @RequestParam(value = "unique", defaultValue = "false") String unique) {
         Boolean uniqueParam = Boolean.valueOf(unique);
+
         return statisticService.getStatistic(start, end, uris, uniqueParam);
     }
 }
