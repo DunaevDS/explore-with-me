@@ -60,7 +60,6 @@ public class StatisticServiceImpl implements StatisticService {
 
     private LocalDateTime parseTimeParam(String time) {
         try {
-            log.info("Time = " + LocalDateTime.parse(time, DateTimeFormatter.ofPattern(TIME_FORMAT)));
             return LocalDateTime.parse(time, DateTimeFormatter.ofPattern(TIME_FORMAT));
         } catch (DateTimeParseException e) {
             throw new StatisticValidationException("Передан некорректный формат времени");
