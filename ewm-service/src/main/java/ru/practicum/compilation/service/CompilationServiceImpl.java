@@ -31,7 +31,7 @@ public class CompilationServiceImpl implements CompilationService {
     private final EventStatService statService;
 
     @Override
-    public List<CompilationDto> findCompilations(Boolean pinned, Integer from, Integer size) {
+    public List<CompilationDto> findCompilations(Boolean pinned, int from, int size) {
         Pageable pageable = PageRequest.of(from / size, size);
         List<Compilation> compilations = compilationRepository.findAllByIsPinned(pinned, pageable);
         log.info("compilations = " + compilations);
