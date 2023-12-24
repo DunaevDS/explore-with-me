@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface CompilationService {
 
-    List<CompilationDto> findCompilations(Boolean pinned, int from, int size);
+    List<CompilationDto> findCompilations(boolean pinned, int from, int size);
 
     CompilationDto findCompilationById(Long compId);
 
