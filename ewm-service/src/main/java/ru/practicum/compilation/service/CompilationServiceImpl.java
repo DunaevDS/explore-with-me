@@ -35,13 +35,13 @@ public class CompilationServiceImpl implements CompilationService {
         Pageable pageable = PageRequest.of(from / size, size);
         List<Compilation> compilations = compilationRepository.findAllByIsPinned(pinned, pageable);
         log.info("compilations = " + compilations);
-        List<Long> Ids = compilations.stream()
+        List<Long> eventIds = compilations.stream()
                 .map(Compilation::getEvents)
                 .flatMap(Collection::stream)
                 .map(Event::getId)
                 .collect(Collectors.toList());
-        log.info("Ids = " + Ids);
-        Map<Long, Long> views = statService.getEventsViews(Ids);
+        log.info("eventIds = " + eventIds);
+        Map<Long, Long> views = statService.getEventsViews(eventIds);
         log.info("views=" + views);
         log.info("Выполнен запрос на поиск подборок событий");
         return CompilationMapper.toDtos(compilations, views);
