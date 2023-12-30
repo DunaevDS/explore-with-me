@@ -54,7 +54,7 @@ public class CompilationServiceImpl implements CompilationService {
         List<Long> events = compilation.getEvents().stream().map(Event::getId).collect(Collectors.toList());
         Map<Long, Long> views = statService.getEventsViews(events);
         log.info("Выполнен поиск подборки событий по id {}", compId);
-        return CompilationMapper.toCompilationDto(compilation, views);
+        return CompilationMapper.toCompilationDto(compilation);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class CompilationServiceImpl implements CompilationService {
         Compilation compilation = CompilationMapper.toNewCompilation(compilationDto, events);
         compilation = compilationRepository.save(compilation);
         log.info("Добавлена новая подборка событий");
-        return CompilationMapper.toCompilationDto(compilation, views);
+        return CompilationMapper.toCompilationDto(compilation);
     }
 
     @Override
@@ -102,6 +102,6 @@ public class CompilationServiceImpl implements CompilationService {
             oldCompilation.setTitle(update.getTitle());
         }
         log.info("Подборка с id {} была обновлена", compId);
-        return CompilationMapper.toCompilationDto(compilationRepository.save(oldCompilation), views);
+        return CompilationMapper.toCompilationDto(compilationRepository.save(oldCompilation));
     }
 }

@@ -53,8 +53,7 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с id" + userId + "не найден"));
         Pageable pageable = PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "id"));
         List<Event> events = eventRepository.findByInitiatorId(userId, pageable).getContent();
-        Map<Long, Long> views = eventStatService.getEventsViews(events.stream().map(Event::getId).collect(Collectors.toList()));
-        List<EventShortDto> userEvents = EventMapper.toShortDtos(events, views);
+        List<EventShortDto> userEvents = EventMapper.toShortDtos(events);
         log.info("Выполнен поиск событий для пользователя с id {}", userId);
         return userEvents;
     }
@@ -258,9 +257,8 @@ public class EventServiceImpl implements EventService {
         }
         );
         List<Event> events = eventRepository.findAll(specification, pageable).getContent();
-        Map<Long, Long> views = eventStatService.getEventsViews(events.stream().map(Event::getId).collect(Collectors.toList()));
         log.info("Выполнен публичный поиск опубликованных событий");
-        return EventMapper.toShortDtos(events, views);
+        return EventMapper.toShortDtos(events);
     }
 
     @Override

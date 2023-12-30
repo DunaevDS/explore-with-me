@@ -23,10 +23,10 @@ public class CompilationMapper {
         return compilation;
     }
 
-    public static CompilationDto toCompilationDto(Compilation compilation, Map<Long, Long> views) {
+    public static CompilationDto toCompilationDto(Compilation compilation) {
         return CompilationDto.builder()
                 .id(compilation.getId())
-                .events(EventMapper.toShortDtos(compilation.getEvents(), views))
+                .events(EventMapper.toShortDtos(compilation.getEvents()))
                 .pinned(compilation.getIsPinned())
                 .title(compilation.getTitle())
                 .build();
@@ -34,6 +34,6 @@ public class CompilationMapper {
 
     public static List<CompilationDto> toDtos(List<Compilation> compilations, Map<Long, Long> views) {
         return compilations.stream()
-                .map(compilation -> toCompilationDto(compilation, views)).collect(Collectors.toList());
+                .map(CompilationMapper::toCompilationDto).collect(Collectors.toList());
     }
 }

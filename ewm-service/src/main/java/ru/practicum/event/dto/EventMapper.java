@@ -78,8 +78,6 @@ public class EventMapper {
     }
 
     public static EventFullDto toEventFullDtoWithViews(Event event, Map<Long, Long> eventViews) {
-        log.info("");
-        log.info("Зашли в toEventFullDtoWithViews");
         EventFullDto fullDto = EventFullDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
@@ -101,7 +99,6 @@ public class EventMapper {
             fullDto.setPublishedOn(event.getPublishedOn().format(FORMATTER));
         }
         log.info("EventFullDto = " + fullDto);
-        log.info("Вышли из toEventFullDtoWithViews");
         return fullDto;
     }
 
@@ -111,7 +108,7 @@ public class EventMapper {
                 .collect(Collectors.toList());
     }
 
-    public static EventShortDto toEventShortDto(Event event, Map<Long, Long> eventViews) {
+    public static EventShortDto toEventShortDto(Event event) {
         return EventShortDto.builder()
                 .annotation(event.getAnnotation())
                 .category(CategoryMapper.toCategoryDto(event.getCategory()))
@@ -120,13 +117,13 @@ public class EventMapper {
                 .initiator(UserMapper.toUserShortDto(event.getInitiator()))
                 .paid(event.getIsPaid())
                 .title(event.getTitle())
-                .views(eventViews.get(event.getId()))
+                .views(null)
                 .build();
     }
 
-    public static List<EventShortDto> toShortDtos(List<Event> events, Map<Long, Long> eventViews) {
+    public static List<EventShortDto> toShortDtos(List<Event> events) {
         return events.stream()
-                .map(event -> toEventShortDto(event, eventViews))
+                .map(event -> toEventShortDto(event))
                 .collect(Collectors.toList());
     }
 }
