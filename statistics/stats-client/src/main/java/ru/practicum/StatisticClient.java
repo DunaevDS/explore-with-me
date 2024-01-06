@@ -1,5 +1,6 @@
 package ru.practicum;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -12,11 +13,12 @@ import ru.practicum.dto.StatisticRequestDto;
 
 import java.util.Map;
 
+@Slf4j
 @Service
 public class StatisticClient extends BaseClient {
 
     @Autowired
-    public StatisticClient(@Value("${stats-service.url}") String serviceUrl, RestTemplateBuilder builder) {
+    public StatisticClient(@Value("${stats-server.url}") String serviceUrl, RestTemplateBuilder builder) {
         super(
                 builder
                         .uriTemplateHandler(new DefaultUriBuilderFactory(serviceUrl + ""))
@@ -39,13 +41,5 @@ public class StatisticClient extends BaseClient {
         return get("/stats?start={start}&end={end}&uris=uris&unique={unique}", params);
     }
 
-    /*public ResponseEntity<Object> getStatistics(String start, String end, List<String> uris, Boolean unique) {
-        Map<String, Object> params = Map.of(
-                "start", start,
-                "end", end,
-                "uris", uris,
-                "unique", unique
-        );
-        return get("/stats?start={start}&end={end}&uris=uris&unique={unique}", params);
-    }*/
+
 }

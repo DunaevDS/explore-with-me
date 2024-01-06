@@ -4,18 +4,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.constant.Constant;
 import ru.practicum.dto.StatisticInDto;
 import ru.practicum.dto.StatisticViewDto;
-import ru.practicum.exception.StatisticValidationException;
 import ru.practicum.model.StatisticMapper;
+import ru.practicum.exception.StatisticValidationException;
 import ru.practicum.repository.StatisticRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-
-import static ru.practicum.constant.Constant.TIME_FORMAT;
 
 @Slf4j
 @Service
@@ -38,11 +37,10 @@ public class StatisticServiceImpl implements StatisticService {
         LocalDateTime endTime = parseTimeParam(end);
         List<StatisticViewDto> dtos;
 
-        /*if (unique) {
-            dtos = statisticRepository.findUniqueStatistic(startTime, endTime, uris);
-        } else {
-            dtos = statisticRepository.findStatistic(startTime, endTime, uris);
-        }*/
+        if (startTime.isAfter(endTime)) {
+            throw new StatisticValidationException(
+                    String.format("Старт не может быть позже конца : старт = %s, конец = %s", start, end));
+        }
 
         if (uris != null) {
             if (unique) {
@@ -59,13 +57,9 @@ public class StatisticServiceImpl implements StatisticService {
         return dtos;
     }
 
-/*        log.info("Выполнение сбора статистики");
-        return dtos;
-    }*/
-
     private LocalDateTime parseTimeParam(String time) {
         try {
-            return LocalDateTime.parse(time, DateTimeFormatter.ofPattern(TIME_FORMAT));
+            return LocalDateTime.parse(time, DateTimeFormatter.ofPattern(Constant.TIME_FORMAT));
         } catch (DateTimeParseException e) {
             throw new StatisticValidationException("Передан некорректный формат времени");
         }
