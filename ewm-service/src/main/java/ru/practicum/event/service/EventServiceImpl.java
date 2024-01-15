@@ -336,6 +336,48 @@ public class EventServiceImpl implements EventService {
         return result;
     }
 
+    @Override
+    public List<EventFullDto> findEventsBySubscriptionOfUser(Long userId, Long subscriberId, Integer from, Integer size) {
+        Map<Long, Long> views;
+        Pageable pageable = PageRequest.of(from / size, size);
+        if (userId.equals(subscriberId)) {
+            throw new DataConflictException("Пользователь не может быть подписан на себя");
+        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с id" + userId + "не найден"));
+        User subscriber = userRepository.findById(subscriberId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с id" + subscriberId + "не найден"));
+        if (!user.getSubscribers().contains(subscriber)) {
+            throw new InvalidRequestException("Пользователь с id " + subscriberId + " не подписан на пользователя с id " +
+                    userId);
+        }
+        List<Event> events = eventRepository.findByInitiatorIdAndState(userId, EventState.PUBLISHED, pageable);
+        views = eventStatService.getEventsViews(events.stream().map(Event::getId).collect(Collectors.toList()));
+        log.info("Найдены события пользователя id {} для подписчика id {}", userId, subscriberId);
+        return EventMapper.toFullDtos(events, views);
+    }
+
+    @Override
+    public List<EventShortDto> findEventsByAllSubscriptions(Long subscriberId, String sort, Integer from, Integer size) {
+        Pageable pageable;
+        SubscribersSort subSort = SubscribersSort.valueOf(sort);
+        if (subSort == SubscribersSort.NEW) {
+            pageable = PageRequest.of(from / size, size, Sort.by("eventDate").descending());
+        } else {
+            pageable = PageRequest.of(from / size, size, Sort.by("eventDate"));
+        }
+
+        User subscriber = userRepository.findById(subscriberId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с id" + subscriberId + "не найден"));
+        if (subscriber.getSubs().isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<Long> subs = subscriber.getSubs().stream().map(User::getId).collect(Collectors.toList());
+        List<Event> events = eventRepository.findByStateAndInitiatorIdIn(EventState.PUBLISHED, subs, pageable);
+        log.info("Найдены события по подпискам пользователя с id {}", subscriberId);
+        return EventMapper.toShortDtos(events);
+    }
+
     private Sort getEventSort(String eventSort) {
         EventSort sort;
         if (eventSort == null) {

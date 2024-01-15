@@ -11,6 +11,8 @@ import ru.practicum.event.dto.*;
 import ru.practicum.event.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -59,5 +61,25 @@ public class EventControllerPublic {
                 LocalDateTime.now());
         statisticClient.postHit(statisticInDto);
         return eventService.findPublishedEventById(id, request);
+    }
+
+    @GetMapping("/users/{userId}/subscribers/{subscriberId}/events")
+    public List<EventFullDto> findEventsBySubscriptionOfUser(@PathVariable Long userId,
+                                                             @PathVariable Long subscriberId,
+                                                             @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer from,
+                                                             @Positive @RequestParam(required = false, defaultValue = "10") Integer size) {
+        log.info(String.format("Получен запрос GET /users/{userId}/subscribers/{subscriberId}/events c параметрами " +
+                        "userId=%s, subscriberId=%s, from=%s, size=%s", userId, subscriberId, from, size));
+        return eventService.findEventsBySubscriptionOfUser(userId, subscriberId, from, size);
+    }
+
+    @GetMapping("/users/subscribers/{subscriberId}/events")
+    public List<EventShortDto> findEventsByAllSubscriptions(@PathVariable Long subscriberId,
+                                                            @RequestParam(required = false, defaultValue = "NEW") String sort,
+                                                            @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer from,
+                                                            @Positive @RequestParam(required = false, defaultValue = "10") Integer size) {
+        log.info(String.format("Получен запрос GET /users/subscribers/{subscriberId}/events c параметрами " +
+                "subscriberId=%s, sort=%s, from=%s, size=%s", subscriberId, sort, from, size));
+        return eventService.findEventsByAllSubscriptions(subscriberId, sort, from, size);
     }
 }

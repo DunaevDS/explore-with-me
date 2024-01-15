@@ -29,4 +29,8 @@ public interface EventService {
     List<ParticipationRequestDto> findUserEventRequests(Long userId, Long eventId);
 
     EventRequestStatusUpdateResult changeEventRequestsStatus(Long userId, Long eventId, EventRequestStatusUpdateRequest request);
+
+    List<EventFullDto> findEventsBySubscriptionOfUser(Long userId, Long subscriberId, Integer from, Integer size);
+
+    List<EventShortDto> findEventsByAllSubscriptions(Long subscriberId, String sort, Integer from, Integer size);
 }

@@ -34,4 +34,13 @@ public class UserMapper {
     public static UserShortDto toUserShortDto(User user) {
         return new UserShortDto(user.getId(), user.getName());
     }
+
+    public static UserWithSubscribersDto toDtoWithSubscribers(User user) {
+        return UserWithSubscribersDto.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .subscribers(toOutDtos(user.getSubscribers()))
+                .build();
+    }
 }
