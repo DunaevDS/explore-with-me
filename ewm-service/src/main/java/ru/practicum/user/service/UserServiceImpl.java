@@ -64,6 +64,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserWithSubscribersDto addSubscriber(Long userId, Long subscriberId) {
         log.info("Зашли в метод addSubscriber");
         if (userId.equals(subscriberId)) {
@@ -80,11 +81,7 @@ public class UserServiceImpl implements UserService {
             throw new DataConflictException("Пользователь с id " + subscriberId + " уже подписан на пользователя с id "
                     + userId);
         }
-        //  я не понимаю почему у меня лист с подписчиками ВСЕГДА пустой в постман тесте, учитывая что в конце метода
-        // все корректно в базу сохраняется. По всей логике считаю, что ошибок нет. Никто особо подсказать не может по этому поводу.
-        // Лучше потрачу 1 попытку, но чтоб Вы дали подсказку куда копать.
-        // Первые 2 теста в постмане ОК проходят, а на третьем, где нужно проверить что подписчик уже есть у пользователя,
-        // все валится, т.к. лист с подписчиками почему-то пустой приходит.
+
         log.info("subscribers list перед добавлением нового подписчика в лист" + user.getSubscribers());
         user.getSubscribers().add(subscriber);
         log.info("subscribers = " + user.getSubscribers());
@@ -97,6 +94,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteSubscriber(Long userId, Long subscriberId) {
         if (userId.equals(subscriberId)) {
             throw new DataConflictException("Пользователь не может быть подписан на себя");
