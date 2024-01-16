@@ -23,13 +23,12 @@ import static ru.practicum.constant.Constant.TIME_FORMAT;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "/events")
 public class EventControllerPublic {
 
     private final EventService eventService;
     private final StatisticClient statisticClient;
 
-    @GetMapping
+    @GetMapping(path = "/events")
     public List<EventShortDto> findEventsByPublic(@RequestParam(required = false) String text,
                                                   @RequestParam(required = false) List<Long> categories,
                                                   @RequestParam(required = false) Boolean paid,
@@ -53,7 +52,7 @@ public class EventControllerPublic {
         return eventService.findEventsByPublic(eventUserParam, request);
     }
 
-    @GetMapping(path = "/{id}")
+    @GetMapping(path = "/events/{id}")
     public EventFullDto findPublishedEventById(@PathVariable Long id,
                                                HttpServletRequest request) {
         log.info(String.format("Получен запрос GET /events/{id} = %s на получение категории", id));
@@ -63,7 +62,7 @@ public class EventControllerPublic {
         return eventService.findPublishedEventById(id, request);
     }
 
-    @GetMapping("/users/{userId}/subscribers/{subscriberId}/events")
+    @GetMapping(path = "/users/{userId}/subscribers/{subscriberId}/events")
     public List<EventFullDto> findEventsBySubscriptionOfUser(@PathVariable Long userId,
                                                              @PathVariable Long subscriberId,
                                                              @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer from,
@@ -73,7 +72,7 @@ public class EventControllerPublic {
         return eventService.findEventsBySubscriptionOfUser(userId, subscriberId, from, size);
     }
 
-    @GetMapping("/users/subscribers/{subscriberId}/events")
+    @GetMapping(path = "/users/subscribers/{subscriberId}/events")
     public List<EventShortDto> findEventsByAllSubscriptions(@PathVariable Long subscriberId,
                                                             @RequestParam(required = false, defaultValue = "NEW") String sort,
                                                             @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer from,

@@ -66,19 +66,19 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserWithSubscribersDto addSubscriber(Long userId, Long subscriberId) {
-        log.info("Зашли в метод addSubscriber");
+        log.info("метод addSubscriber");
         if (userId.equals(subscriberId)) {
             throw new DataConflictException("Пользователь не может подписаться на себя");
         }
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с id" + userId + "не найден"));
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с id = " + userId + "не найден"));
         log.info("user in method = " + user);
         User subscriber = userRepository.findById(subscriberId)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с id" + subscriberId + "не найден"));
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с id = " + subscriberId + "не найден"));
         log.info("subscriber in method = " + subscriber);
 
         if (user.getSubscribers().contains(subscriber)) {
-            throw new DataConflictException("Пользователь с id " + subscriberId + " уже подписан на пользователя с id "
+            throw new DataConflictException("Пользователь с id = " + subscriberId + " уже подписан на пользователя с id "
                     + userId);
         }
 
@@ -87,27 +87,35 @@ public class UserServiceImpl implements UserService {
         log.info("subscribers = " + user.getSubscribers());
 
         user = userRepository.save(user);
-        log.info("Пользователь с id {} подписался на пользователя с id {}", subscriberId, userId);
+        log.info("Пользователь с id = {} подписался на пользователя с id = {}", subscriberId, userId);
 
-        log.info("dto на выходе = " + UserMapper.toDtoWithSubscribers(user));
-        return UserMapper.toDtoWithSubscribers(user);
+        UserWithSubscribersDto dto = UserMapper.toDtoWithSubscribers(user);
+        log.info("dto на выходе из метода = " + dto);
+        return dto;
     }
 
     @Override
     @Transactional
     public void deleteSubscriber(Long userId, Long subscriberId) {
+        log.info("метод deleteSubscriber");
         if (userId.equals(subscriberId)) {
             throw new DataConflictException("Пользователь не может быть подписан на себя");
         }
         User user = findUserById(userId);
+        log.info("user in method = " + user);
         User subscriber = findUserById(subscriberId);
+        log.info("subscriber in method = " + subscriber);
 
         if (!user.getSubscribers().contains(subscriber)) {
-            throw new DataConflictException("Пользователь с id " + subscriberId + " не подписан на пользователя с id "
-                    + userId);
+            throw new DataConflictException("Пользователь с id = " + subscriberId + " не подписан на" +
+                    " пользователя с id = " + userId);
         }
+        log.info("subscribers list перед удалением подписчика" + user.getSubscribers());
         user.getSubscribers().remove(subscriber);
-        log.info("Пользователь с id {} отписан от пользователя с id {}", subscriberId, userId);
+        log.info("subscribers list после удаления подписчика" + user.getSubscribers());
+
+        log.info("Пользователь с id = {} отписал от пользователя с id = {}", subscriberId, userId);
         userRepository.save(user);
+        log.info("user в конце метода = " + user);
     }
 }

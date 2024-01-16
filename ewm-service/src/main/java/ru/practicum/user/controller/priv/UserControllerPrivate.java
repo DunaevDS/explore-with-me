@@ -21,7 +21,7 @@ public class UserControllerPrivate {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserWithSubscribersDto addSubscriber(@PathVariable Long userId,
-                                              @PathVariable Long subscriberId) {
+                                                @PathVariable Long subscriberId) {
         log.info(String.format("Получен запрос POST /users/{userId}/subscribers/{subscriberId} с параметрами " +
                 "userId=%s, subscriberId=%s", userId, subscriberId));
         return userService.addSubscriber(userId, subscriberId);

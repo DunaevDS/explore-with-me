@@ -21,7 +21,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        log.error("Ошибка валидации параметра");
+        log.error("BAD_REQUEST: Ошибка валидации параметра");
         StringWriter out = new StringWriter();
         e.printStackTrace(new PrintWriter(out));
         String stackTrace = out.toString();
@@ -32,7 +32,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleDataValidationException(DataValidationException e) {
-        log.error("Ошибка в поступивших данных", e);
+        log.error("BAD_REQUEST: Ошибка в поступивших данных", e);
         StringWriter out = new StringWriter();
         e.printStackTrace(new PrintWriter(out));
         String stackTrace = out.toString();
@@ -43,7 +43,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleDataIntegrityViolationException(DataIntegrityViolationException e) {
-        log.error("Нарушено ограничение целостности базы данных");
+        log.error("CONFLICT: Нарушено ограничение целостности базы данных");
         StringWriter out = new StringWriter();
         e.printStackTrace(new PrintWriter(out));
         String stackTrace = out.toString();
@@ -54,7 +54,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleDataConflictException(DataConflictException e) {
-        log.error("Конфликт при выполнении запроса");
+        log.error("CONFLICT: Конфликт при выполнении запроса");
         StringWriter out = new StringWriter();
         e.printStackTrace(new PrintWriter(out));
         String stackTrace = out.toString();
@@ -65,7 +65,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handleCategoryNotFoundException(CategoryNotFoundException e) {
-        log.error("Ошибка поиска категории", e);
+        log.error("NOT_FOUND: Ошибка поиска категории", e);
         StringWriter out = new StringWriter();
         e.printStackTrace(new PrintWriter(out));
         String stackTrace = out.toString();
@@ -76,7 +76,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handleUserNotFoundException(UserNotFoundException e) {
-        log.error("Ошибка поиска пользователя");
+        log.error("NOT_FOUND: Ошибка поиска пользователя");
         StringWriter out = new StringWriter();
         e.printStackTrace(new PrintWriter(out));
         String stackTrace = out.toString();
@@ -87,7 +87,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handleEventNotFoundException(EventNotFoundException e) {
-        log.error("Ошибка поиска события");
+        log.error("NOT_FOUND: Ошибка поиска события");
         StringWriter out = new StringWriter();
         e.printStackTrace(new PrintWriter(out));
         String stackTrace = out.toString();
@@ -98,7 +98,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handleCompilationNotFoundException(CompilationNotFoundException e) {
-        log.error("Ошибка поиска подборки");
+        log.error("NOT_FOUND: Ошибка поиска подборки");
         StringWriter out = new StringWriter();
         e.printStackTrace(new PrintWriter(out));
         String stackTrace = out.toString();
@@ -109,7 +109,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handleRequestNotFoundException(RequestNotFoundException e) {
-        log.error("Ошибка поиска запроса на участие");
+        log.error("NOT_FOUND: Ошибка поиска запроса на участие");
         StringWriter out = new StringWriter();
         e.printStackTrace(new PrintWriter(out));
         String stackTrace = out.toString();
@@ -120,7 +120,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
-        log.error("Отстутсвует необходимый параметр запроса");
+        log.error("BAD_REQUEST: Отстутсвует необходимый параметр запроса");
         StringWriter out = new StringWriter();
         e.printStackTrace(new PrintWriter(out));
         String stackTrace = out.toString();
@@ -131,7 +131,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleInvalidRequestException(InvalidRequestException e) {
-        log.error("Некорректный запрос");
+        log.error("BAD_REQUEST: Некорректный запрос");
         StringWriter out = new StringWriter();
         e.printStackTrace(new PrintWriter(out));
         String stackTrace = out.toString();
@@ -142,7 +142,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiError handleUnknownException(Throwable e) {
-        log.error("Возникла непредвиденная ошибка", e);
+        log.error("INTERNAL_SERVER_ERROR: Возникла непредвиденная ошибка", e);
         StringWriter out = new StringWriter();
         e.printStackTrace(new PrintWriter(out));
         String stackTrace = out.toString();
