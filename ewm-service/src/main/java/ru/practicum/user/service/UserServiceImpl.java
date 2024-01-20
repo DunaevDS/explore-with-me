@@ -14,7 +14,9 @@ import ru.practicum.user.dto.UserMapper;
 import ru.practicum.user.dto.UserOutDto;
 import ru.practicum.user.dto.UserWithSubscribersDto;
 import ru.practicum.user.model.User;
+import ru.practicum.user.model.UserSubscriber;
 import ru.practicum.user.repository.UserRepository;
+import ru.practicum.user.repository.UserSubscriberRepository;
 
 import java.util.List;
 
@@ -25,6 +27,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserSubscriberRepository userSubscriberRepository;
 
     @Override
     public List<UserOutDto> findUsers(List<Long> ids, Integer from, Integer size) {
@@ -42,7 +45,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserOutDto addUser(UserInDto inDto) {
-        User user = UserMapper.toUser(inDto);
+        User user = UserMapper.toUserSubscriber(inDto);
         log.info("Добавление нового пользователя");
         return UserMapper.toUserOutDto(userRepository.save(user));
     }
@@ -67,29 +70,32 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserWithSubscribersDto addSubscriber(Long userId, Long subscriberId) {
         log.info("метод addSubscriber");
+
         if (userId.equals(subscriberId)) {
             throw new DataConflictException("Пользователь не может подписаться на себя");
         }
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с id = " + userId + "не найден"));
-        log.info("user in method = " + user);
-        User subscriber = userRepository.findById(subscriberId)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с id = " + subscriberId + "не найден"));
-        log.info("subscriber in method = " + subscriber);
 
-        if (user.getSubscribers().contains(subscriber)) {
-            throw new DataConflictException("Пользователь с id = " + subscriberId + " уже подписан на пользователя с id "
-                    + userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с id = " + userId + " не найден"));
+        log.info("user = " + user);
+        User subscriber = userRepository.findById(subscriberId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с id = " + subscriberId + " не найден"));
+        log.info("subscriber = " + subscriber);
+
+        UserSubscriber existingSubscriber = userSubscriberRepository.findByUserIdAndSubscriberId(userId, subscriberId);
+        if (existingSubscriber != null) {
+            throw new DataConflictException("Пользователь с id = " + subscriberId + " уже подписан на пользователя с id " + userId);
         }
 
-        log.info("subscribers list перед добавлением нового подписчика в лист" + user.getSubscribers());
-        user.getSubscribers().add(subscriber);
-        log.info("subscribers = " + user.getSubscribers());
+        UserSubscriber userSubscriber = UserMapper.toUserSubscriber(user, subscriber);
+        log.info("userSubscriber model = " + userSubscriber);
 
-        user = userRepository.save(user);
+        userSubscriberRepository.save(userSubscriber);
         log.info("Пользователь с id = {} подписался на пользователя с id = {}", subscriberId, userId);
 
-        UserWithSubscribersDto dto = UserMapper.toDtoWithSubscribers(user);
+        List<UserSubscriber> subscribers = userSubscriberRepository.findByUserId(userId);
+        log.info("subscribers = " + subscribers);
+        UserWithSubscribersDto dto = UserMapper.toDtoWithSubscribers(user, subscribers);
         log.info("dto на выходе из метода = " + dto);
         return dto;
     }
@@ -98,24 +104,20 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteSubscriber(Long userId, Long subscriberId) {
         log.info("метод deleteSubscriber");
-        if (userId.equals(subscriberId)) {
-            throw new DataConflictException("Пользователь не может быть подписан на себя");
-        }
-        User user = findUserById(userId);
-        log.info("user in method = " + user);
-        User subscriber = findUserById(subscriberId);
-        log.info("subscriber in method = " + subscriber);
 
-        if (!user.getSubscribers().contains(subscriber)) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с id = " + userId + "не найден"));
+        userRepository.findById(subscriberId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с id = " + subscriberId + "не найден"));
+
+        UserSubscriber userSubscriber = userSubscriberRepository.findByUserIdAndSubscriberId(userId, subscriberId);
+        if (userSubscriber == null) {
             throw new DataConflictException("Пользователь с id = " + subscriberId + " не подписан на" +
                     " пользователя с id = " + userId);
         }
-        log.info("subscribers list перед удалением подписчика" + user.getSubscribers());
-        user.getSubscribers().remove(subscriber);
-        log.info("subscribers list после удаления подписчика" + user.getSubscribers());
+
+        userSubscriberRepository.delete(userSubscriber);
 
         log.info("Пользователь с id = {} отписал от пользователя с id = {}", subscriberId, userId);
-        userRepository.save(user);
-        log.info("user в конце метода = " + user);
     }
 }
