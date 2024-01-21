@@ -271,8 +271,44 @@
 			"response": []
 		},
 		{
-			"name": "get user feed standart params successful",
+			"name": "get user subscribers all successful",
 			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const main = async () => {\r",
+							"    const api = new API(pm);\r",
+							"    const rnd = new RandomUtils();\r",
+							"    try {\r",
+							"        const user = await api.addUser(rnd.getUser());\r",
+							"        const subscriber = await api.addUser(rnd.getUser());\r",
+							"        const user2 = await api.addUser(rnd.getUser());\r",
+							"        const user3 = await api.addUser(rnd.getUser());\r",
+							"        pm.collectionVariables.set(\"uid\", user.id);\r",
+							"        pm.collectionVariables.set(\"subscriberId\", subscriber.id);\r",
+							"        await api.addFollower(user.id, subscriber.id);\r",
+							"        await api.addFollower(user.id, user2.id);\r",
+							"        await api.addFollower(user.id, user3.id);\r",
+							"    } catch(err) {\r",
+							"        console.error(\"Error creating test data.\", err);\r",
+							"    }\r",
+							"};\r",
+							"\r",
+							"const interval = setInterval(() => {}, 1000);\r",
+							"setTimeout(async () => {\r",
+							"    try {\r",
+							"        await main();\r",
+							"    } catch (e) {\r",
+							"        console.error(e);\r",
+							"    } finally {\r",
+							"        clearInterval(interval);\r",
+							"    }\r",
+							"}, 100);"
+						],
+						"type": "text/javascript"
+					}
+				},
 				{
 					"listen": "test",
 					"script": {
@@ -290,7 +326,154 @@
 						],
 						"type": "text/javascript"
 					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/users/:userId/subscribers",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						":userId",
+						"subscribers"
+					],
+					"query": [
+						{
+							"key": "ids",
+							"value": "",
+							"disabled": true
+						},
+						{
+							"key": "from",
+							"value": "1",
+							"disabled": true
+						},
+						{
+							"key": "size",
+							"value": "10",
+							"disabled": true
+						}
+					],
+					"variable": [
+						{
+							"key": "userId",
+							"value": "{{uid}}",
+							"type": "string"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get user subscriptions all successful",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+							"    pm.response.to.be.ok;    \r",
+							"    pm.response.to.be.withBody;\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"const target = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Пользователи должны содержать поля: id, name, email\", function () {\r",
+							"    pm.expect(target[0]).to.have.property('id');\r",
+							"    pm.expect(target[0]).to.have.property('name');\r",
+							"    pm.expect(target[0]).to.have.property('email');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ответ должен быть списком событий\", function() {\r",
+							"    const body = pm.response.json();\r",
+							"    pm.expect(body).is.an('array');\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
 				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const main = async () => {\r",
+							"    const api = new API(pm);\r",
+							"    const rnd = new RandomUtils();\r",
+							"    try {\r",
+							"        const user = await api.addUser(rnd.getUser());\r",
+							"        const subscriber = await api.addUser(rnd.getUser());\r",
+							"        const user2 = await api.addUser(rnd.getUser());\r",
+							"        pm.collectionVariables.set(\"uid\", user.id);\r",
+							"        pm.collectionVariables.set(\"subscriberId\", subscriber.id);\r",
+							"        await api.addFollower(user.id, subscriber.id);\r",
+							"        await api.addFollower(user2.id, subscriber.id);\r",
+							"    } catch(err) {\r",
+							"        console.error(\"Error creating test data.\", err);\r",
+							"    }\r",
+							"};\r",
+							"\r",
+							"const interval = setInterval(() => {}, 1000);\r",
+							"setTimeout(async () => {\r",
+							"    try {\r",
+							"        await main();\r",
+							"    } catch (e) {\r",
+							"        console.error(e);\r",
+							"    } finally {\r",
+							"        clearInterval(interval);\r",
+							"    }\r",
+							"}, 100);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/users/:userId/subscriptions?from=1&size=10",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						":userId",
+						"subscriptions"
+					],
+					"query": [
+						{
+							"key": "ids",
+							"value": "1",
+							"disabled": true
+						},
+						{
+							"key": "from",
+							"value": "1"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						}
+					],
+					"variable": [
+						{
+							"key": "userId",
+							"value": "{{subscriberId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get user feed standart params successful",
+			"event": [
 				{
 					"listen": "prerequest",
 					"script": {
@@ -324,6 +507,24 @@
 							"        clearInterval(interval);\r",
 							"    }\r",
 							"}, 100);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function() {\r",
+							"    pm.response.to.be.ok;\r",
+							"    pm.response.to.be.withBody;\r",
+							"    pm.response.to.be.json;\r",
+							"}); \r",
+							"\r",
+							"pm.test(\"Ответ должен быть списком событий\", function() {\r",
+							"    const body = pm.response.json();\r",
+							"    pm.expect(body).is.an('array');\r",
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -381,6 +582,38 @@
 						],
 						"type": "text/javascript"
 					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const main = async () => {\r",
+							"    const api = new API(pm);\r",
+							"    const rnd = new RandomUtils();\r",
+							"    try {\r",
+							"        const user = await api.addUser(rnd.getUser());\r",
+							"        const subscriber = await api.addUser(rnd.getUser());\r",
+							"        pm.collectionVariables.set(\"uid\", user.id);\r",
+							"        pm.collectionVariables.set(\"subscriberId\", subscriber.id);\r",
+							"        await api.addFollower(user.id, subscriber.id);\r",
+							"    } catch(err) {\r",
+							"        console.error(\"Error creating test data.\", err);\r",
+							"    }\r",
+							"};\r",
+							"\r",
+							"const interval = setInterval(() => {}, 1000);\r",
+							"setTimeout(async () => {\r",
+							"    try {\r",
+							"        await main();\r",
+							"    } catch (e) {\r",
+							"        console.error(e);\r",
+							"    } finally {\r",
+							"        clearInterval(interval);\r",
+							"    }\r",
+							"}, 100);"
+						],
+						"type": "text/javascript"
+					}
 				}
 			],
 			"request": {
@@ -411,11 +644,11 @@
 					"variable": [
 						{
 							"key": "userId",
-							"value": "1"
+							"value": "{{uid}}"
 						},
 						{
 							"key": "subscriberId",
-							"value": "2"
+							"value": "{{subscriberId}}"
 						}
 					]
 				}
@@ -432,6 +665,38 @@
 							"pm.test(\"Тест на валидацию параметров\", function() {\r",
 							"    pm.expect(pm.response.code).to.equal(500);\r",
 							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const main = async () => {\r",
+							"    const api = new API(pm);\r",
+							"    const rnd = new RandomUtils();\r",
+							"    try {\r",
+							"        const user = await api.addUser(rnd.getUser());\r",
+							"        const subscriber = await api.addUser(rnd.getUser());\r",
+							"        pm.collectionVariables.set(\"uid\", user.id);\r",
+							"        pm.collectionVariables.set(\"subscriberId\", subscriber.id);\r",
+							"        await api.addFollower(user.id, subscriber.id);\r",
+							"    } catch(err) {\r",
+							"        console.error(\"Error creating test data.\", err);\r",
+							"    }\r",
+							"};\r",
+							"\r",
+							"const interval = setInterval(() => {}, 1000);\r",
+							"setTimeout(async () => {\r",
+							"    try {\r",
+							"        await main();\r",
+							"    } catch (e) {\r",
+							"        console.error(e);\r",
+							"    } finally {\r",
+							"        clearInterval(interval);\r",
+							"    }\r",
+							"}, 100);"
 						],
 						"type": "text/javascript"
 					}
@@ -465,11 +730,11 @@
 					"variable": [
 						{
 							"key": "userId",
-							"value": "1"
+							"value": "{{uid}}"
 						},
 						{
 							"key": "subscriberId",
-							"value": "2"
+							"value": "{{subscriberId}}"
 						}
 					]
 				}
@@ -484,8 +749,41 @@
 					"script": {
 						"exec": [
 							"pm.test(\"Тест на ошибку получения событий без подписки\", function() {\r",
-							"    pm.expect(pm.response.code).to.equal(500);\r",
+							"    pm.expect(pm.response.code).to.equal(409);\r",
 							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const main = async () => {\r",
+							"    const api = new API(pm);\r",
+							"    const rnd = new RandomUtils();\r",
+							"    try {\r",
+							"        const user = await api.addUser(rnd.getUser());\r",
+							"        const subscriber = await api.addUser(rnd.getUser());\r",
+							"        const user2 = await api.addUser(rnd.getUser());\r",
+							"        pm.collectionVariables.set(\"uid\", user.id);\r",
+							"        pm.collectionVariables.set(\"subscriberId\", subscriber.id);\r",
+							"        await api.addFollower(user2.id, subscriber.id);\r",
+							"    } catch(err) {\r",
+							"        console.error(\"Error creating test data.\", err);\r",
+							"    }\r",
+							"};\r",
+							"\r",
+							"const interval = setInterval(() => {}, 1000);\r",
+							"setTimeout(async () => {\r",
+							"    try {\r",
+							"        await main();\r",
+							"    } catch (e) {\r",
+							"        console.error(e);\r",
+							"    } finally {\r",
+							"        clearInterval(interval);\r",
+							"    }\r",
+							"}, 100);"
 						],
 						"type": "text/javascript"
 					}
@@ -519,11 +817,11 @@
 					"variable": [
 						{
 							"key": "userId",
-							"value": "1"
+							"value": "{{uid}}"
 						},
 						{
 							"key": "subscriberId",
-							"value": ""
+							"value": "{{subscriberId}}"
 						}
 					]
 				}
@@ -547,6 +845,40 @@
 							"    const body = pm.response.json();\r",
 							"    pm.expect(body).is.an('array');\r",
 							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const main = async () => {\r",
+							"    const api = new API(pm);\r",
+							"    const rnd = new RandomUtils();\r",
+							"    try {\r",
+							"        const user = await api.addUser(rnd.getUser());\r",
+							"        const subscriber = await api.addUser(rnd.getUser());\r",
+							"        const user2 = await api.addUser(rnd.getUser());\r",
+							"        pm.collectionVariables.set(\"uid\", user.id);\r",
+							"        pm.collectionVariables.set(\"subscriberId\", subscriber.id);\r",
+							"        await api.addFollower(user.id, subscriber.id);\r",
+							"        await api.addFollower(user2.id, subscriber.id);\r",
+							"    } catch(err) {\r",
+							"        console.error(\"Error creating test data.\", err);\r",
+							"    }\r",
+							"};\r",
+							"\r",
+							"const interval = setInterval(() => {}, 1000);\r",
+							"setTimeout(async () => {\r",
+							"    try {\r",
+							"        await main();\r",
+							"    } catch (e) {\r",
+							"        console.error(e);\r",
+							"    } finally {\r",
+							"        clearInterval(interval);\r",
+							"    }\r",
+							"}, 100);"
 						],
 						"type": "text/javascript"
 					}
@@ -583,7 +915,7 @@
 					"variable": [
 						{
 							"key": "subscriberId",
-							"value": "2"
+							"value": "{{subscriberId}}"
 						}
 					]
 				}
@@ -600,6 +932,40 @@
 							"pm.test(\"Тест на валидацию параметров\", function() {\r",
 							"    pm.expect(pm.response.code).to.equal(500);\r",
 							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const main = async () => {\r",
+							"    const api = new API(pm);\r",
+							"    const rnd = new RandomUtils();\r",
+							"    try {\r",
+							"        const user = await api.addUser(rnd.getUser());\r",
+							"        const subscriber = await api.addUser(rnd.getUser());\r",
+							"        const user2 = await api.addUser(rnd.getUser());\r",
+							"        pm.collectionVariables.set(\"uid\", user.id);\r",
+							"        pm.collectionVariables.set(\"subscriberId\", subscriber.id);\r",
+							"        await api.addFollower(user.id, subscriber.id);\r",
+							"        await api.addFollower(user2.id, subscriber.id);\r",
+							"    } catch(err) {\r",
+							"        console.error(\"Error creating test data.\", err);\r",
+							"    }\r",
+							"};\r",
+							"\r",
+							"const interval = setInterval(() => {}, 1000);\r",
+							"setTimeout(async () => {\r",
+							"    try {\r",
+							"        await main();\r",
+							"    } catch (e) {\r",
+							"        console.error(e);\r",
+							"    } finally {\r",
+							"        clearInterval(interval);\r",
+							"    }\r",
+							"}, 100);"
 						],
 						"type": "text/javascript"
 					}
@@ -636,7 +1002,7 @@
 					"variable": [
 						{
 							"key": "subscriberId",
-							"value": ""
+							"value": "{{subscriberId}}"
 						}
 					]
 				}
@@ -653,6 +1019,40 @@
 							"pm.test(\"Тест на валидацию параметров\", function() {\r",
 							"    pm.expect(pm.response.code).to.equal(500);\r",
 							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const main = async () => {\r",
+							"    const api = new API(pm);\r",
+							"    const rnd = new RandomUtils();\r",
+							"    try {\r",
+							"        const user = await api.addUser(rnd.getUser());\r",
+							"        const subscriber = await api.addUser(rnd.getUser());\r",
+							"        const user2 = await api.addUser(rnd.getUser());\r",
+							"        pm.collectionVariables.set(\"uid\", user.id);\r",
+							"        pm.collectionVariables.set(\"subscriberId\", subscriber.id);\r",
+							"        await api.addFollower(user.id, subscriber.id);\r",
+							"        await api.addFollower(user2.id, subscriber.id);\r",
+							"    } catch(err) {\r",
+							"        console.error(\"Error creating test data.\", err);\r",
+							"    }\r",
+							"};\r",
+							"\r",
+							"const interval = setInterval(() => {}, 1000);\r",
+							"setTimeout(async () => {\r",
+							"    try {\r",
+							"        await main();\r",
+							"    } catch (e) {\r",
+							"        console.error(e);\r",
+							"    } finally {\r",
+							"        clearInterval(interval);\r",
+							"    }\r",
+							"}, 100);"
 						],
 						"type": "text/javascript"
 					}
@@ -689,7 +1089,7 @@
 					"variable": [
 						{
 							"key": "subscriberId",
-							"value": "2"
+							"value": "{{subscriberId}}"
 						}
 					]
 				}

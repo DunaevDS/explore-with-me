@@ -4,8 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.event.dto.EventFullDto;
+import ru.practicum.event.dto.EventMapper;
+import ru.practicum.event.dto.EventShortDto;
+import ru.practicum.event.model.Event;
+import ru.practicum.event.model.EventState;
+import ru.practicum.event.model.SubscribersSort;
 import ru.practicum.exception.DataConflictException;
 import ru.practicum.exception.DataValidationException;
 import ru.practicum.exception.UserNotFoundException;
@@ -17,8 +24,13 @@ import ru.practicum.user.model.User;
 import ru.practicum.user.model.UserSubscriber;
 import ru.practicum.user.repository.UserRepository;
 import ru.practicum.user.repository.UserSubscriberRepository;
+import ru.practicum.event.repository.EventRepository;
+import ru.practicum.event.service.EventStatService;
 
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,6 +41,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserSubscriberRepository userSubscriberRepository;
+    private final EventRepository eventRepository;
+    private final EventStatService eventStatService;
 
     @Override
     public List<UserOutDto> findUsers(List<Long> ids, Integer from, Integer size) {
@@ -70,8 +84,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserWithSubscribersDto addSubscriber(Long userId, Long subscriberId) {
-        log.info("метод addSubscriber");
-
         if (userId.equals(subscriberId)) {
             throw new DataConflictException("Пользователь не может подписаться на себя");
         }
@@ -96,16 +108,13 @@ public class UserServiceImpl implements UserService {
 
         List<UserSubscriber> subscribers = userSubscriberRepository.findByUserId(userId);
         log.info("subscribers = " + subscribers);
-        UserWithSubscribersDto dto = UserMapper.toDtoWithSubscribers(user, subscribers);
-        log.info("dto на выходе из метода = " + dto);
-        return dto;
+
+        return UserMapper.toDtoWithSubscribers(user, subscribers);
     }
 
     @Override
     @Transactional
     public void deleteSubscriber(Long userId, Long subscriberId) {
-        log.info("метод deleteSubscriber");
-
         userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с id = " + userId + "не найден"));
         userRepository.findById(subscriberId)
@@ -116,18 +125,14 @@ public class UserServiceImpl implements UserService {
             throw new DataConflictException("Пользователь с id = " + subscriberId + " не подписан на" +
                     " пользователя с id = " + userId);
         }
-
         userSubscriberRepository.delete(userSubscriber);
-
         log.info("Пользователь с id = {} отписал от пользователя с id = {}", subscriberId, userId);
     }
 
     @Override
     public List<UserOutDto> getSubscribers(Long userId, List<Long> ids, Integer from, Integer size) {
-        log.info("метод getSubscribers");
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с id = " + userId + " не найден"));
-        log.info("user = " + user);
 
         List<UserSubscriber> users;
         Pageable pageRequest = PageRequest.of(from / size, size);
@@ -141,17 +146,13 @@ public class UserServiceImpl implements UserService {
                     .collect(Collectors.toList());
             log.info("users = " + users);
         }
-        var dto = UserMapper.toOutDtosSubs(users);
-        log.info("dto = " + dto);
-        return dto;
+        return UserMapper.toOutDtosSubs(users);
     }
 
     @Override
     public List<UserOutDto> getSubscriptions(Long userId, List<Long> ids, Integer from, Integer size) {
-        log.info("метод getSubscriptions");
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с id = " + userId + " не найден"));
-        log.info("user = " + user);
 
         List<UserSubscriber> users;
         Pageable pageRequest = PageRequest.of(from / size, size);
@@ -165,8 +166,54 @@ public class UserServiceImpl implements UserService {
                     .collect(Collectors.toList());
             log.info("users = " + users);
         }
-        var dto = UserMapper.toOutDtosSubscriptions(users);
-        log.info("dto = " + dto);
-        return dto;
+        return UserMapper.toOutDtosSubscriptions(users);
+    }
+
+    @Override
+    public List<EventFullDto> findEventsBySubscriptionOfUser(Long userId, Long subscriberId, Integer from, Integer size) {
+
+        Pageable pageable = PageRequest.of(from / size, size);
+        if (userId.equals(subscriberId)) {
+            throw new DataConflictException("Пользователь не может быть подписан на себя");
+        }
+        userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с id" + userId + "не найден"));
+        userRepository.findById(subscriberId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с id" + subscriberId + "не найден"));
+
+        UserSubscriber userSubscriber = userSubscriberRepository.findByUserIdAndSubscriberId(userId, subscriberId);
+        if (userSubscriber == null) {
+            throw new DataConflictException("Пользователь с id = " + subscriberId + " не подписан на" +
+                    " пользователя с id = " + userId);
+        }
+
+        List<Event> events = eventRepository.findByInitiatorIdAndState(userId, EventState.PUBLISHED, pageable);
+
+        Map<Long, Long> views = eventStatService.getEventsViews(events.stream().map(Event::getId).collect(Collectors.toList()));
+        log.info("Найдены события пользователя id {} для подписчика id {}", userId, subscriberId);
+
+        return EventMapper.toFullDtos(events, views);
+    }
+
+    @Override
+    public List<EventShortDto> findEventsByAllSubscriptions(Long subscriberId, String sort, Integer from, Integer size) {
+        Pageable pageable;
+        SubscribersSort subSort = SubscribersSort.valueOf(sort);
+        if (subSort == SubscribersSort.NEW) {
+            pageable = PageRequest.of(from / size, size, Sort.by("eventDate").descending());
+        } else {
+            pageable = PageRequest.of(from / size, size, Sort.by("eventDate"));
+        }
+
+        User subscriber = userRepository.findById(subscriberId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с id" + subscriberId + "не найден"));
+        if (subscriber.getSubs().isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<Long> subs = subscriber.getSubs().stream().map(User::getId).collect(Collectors.toList());
+        List<Event> events = eventRepository.findByStateAndInitiatorIdIn(EventState.PUBLISHED, subs, pageable);
+
+        log.info("Найдены события по подпискам пользователя с id {}", subscriberId);
+        return EventMapper.toShortDtos(events);
     }
 }

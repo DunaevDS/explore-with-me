@@ -1,5 +1,7 @@
 package ru.practicum.user.service;
 
+import ru.practicum.event.dto.EventFullDto;
+import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.user.dto.UserInDto;
 import ru.practicum.user.dto.UserOutDto;
 import ru.practicum.user.dto.UserWithSubscribersDto;
@@ -24,4 +26,8 @@ public interface UserService {
     List<UserOutDto> getSubscribers(Long userId, List<Long> ids, Integer from, Integer size);
 
     List<UserOutDto> getSubscriptions(Long userId, List<Long> ids, Integer from, Integer size);
+
+    List<EventFullDto> findEventsBySubscriptionOfUser(Long userId, Long subscriberId, Integer from, Integer size);
+
+    List<EventShortDto> findEventsByAllSubscriptions(Long subscriberId, String sort, Integer from, Integer size);
 }
