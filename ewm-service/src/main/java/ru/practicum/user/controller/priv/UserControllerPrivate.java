@@ -45,17 +45,18 @@ public class UserControllerPrivate {
     @GetMapping(path = "/users/{userId}/subscribers")
     public List<UserOutDto> getSubscribers(@PathVariable Long userId,
                                            @RequestParam(required = false) List<Long> ids,
-                                      @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer from,
-                                      @Positive @RequestParam(required = false, defaultValue = "10") Integer size) {
+                                           @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer from,
+                                           @Positive @RequestParam(required = false, defaultValue = "10") Integer size) {
         log.info(String.format("Получен запрос GET /users/{userId}/subscribers с параметрами " +
                 "userId = %s, ids=%s, начиная с %s, по %s на странице", userId, ids, from, size));
         return userService.getSubscribers(userId, ids, from, size);
     }
+
     @GetMapping(path = "/users/{userId}/subscriptions")
     public List<UserOutDto> getSubscriptions(@PathVariable Long userId,
-                                           @RequestParam(required = false) List<Long> ids,
-                                           @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer from,
-                                           @Positive @RequestParam(required = false, defaultValue = "10") Integer size) {
+                                             @RequestParam(required = false) List<Long> ids,
+                                             @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer from,
+                                             @Positive @RequestParam(required = false, defaultValue = "10") Integer size) {
         log.info(String.format("Получен запрос GET /users/{userId}/subscriptions с параметрами " +
                 "userId = %s, ids=%s, начиная с %s, по %s на странице", userId, ids, from, size));
         return userService.getSubscriptions(userId, ids, from, size);
