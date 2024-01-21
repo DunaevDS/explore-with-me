@@ -20,4 +20,6 @@ public interface UserService {
     UserWithSubscribersDto addSubscriber(Long userId, Long subscriberId);
 
     void deleteSubscriber(Long userId, Long subscriberId);
+
+    List<UserOutDto> getSubscribers(Long userId, List<Long> ids,  Integer from, Integer size);
 }

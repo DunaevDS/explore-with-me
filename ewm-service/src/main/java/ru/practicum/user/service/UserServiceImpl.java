@@ -19,6 +19,7 @@ import ru.practicum.user.repository.UserRepository;
 import ru.practicum.user.repository.UserSubscriberRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -119,5 +120,29 @@ public class UserServiceImpl implements UserService {
         userSubscriberRepository.delete(userSubscriber);
 
         log.info("Пользователь с id = {} отписал от пользователя с id = {}", subscriberId, userId);
+    }
+
+    @Override
+    public List<UserOutDto> getSubscribers(Long userId, List<Long> ids, Integer from, Integer size) {
+        log.info("метод getSubscribers");
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с id = " + userId + " не найден"));
+        log.info("user = " + user);
+
+        List<UserSubscriber> users;
+        Pageable pageRequest = PageRequest.of(from / size, size);
+        if (ids == null || ids.isEmpty()) {
+            users = userSubscriberRepository.findAllByUserId(userId, pageRequest);
+            log.info("users = " + users);
+        } else {
+            users = userSubscriberRepository.findAllByUserId(userId, pageRequest)
+                    .stream()
+                    .filter(userSubscriber -> ids.contains(userSubscriber.getSubscriber().getId()))
+                    .collect(Collectors.toList());
+            log.info("users = " + users);
+        }
+        var dto = UserMapper.toOutDtosSubs(users);
+        log.info("dto = " + dto);
+        return dto;
     }
 }

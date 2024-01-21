@@ -1,4 +1,5 @@
 package ru.practicum.user.repository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import ru.practicum.user.model.UserSubscriber;
@@ -10,4 +11,6 @@ public interface UserSubscriberRepository extends JpaRepository<UserSubscriber, 
     UserSubscriber findByUserIdAndSubscriberId(Long userId, Long subscriberId);
 
     List<UserSubscriber> findByUserId(Long userId);
+
+    List<UserSubscriber> findAllByUserId(Long userId, Pageable pageable);
 }
