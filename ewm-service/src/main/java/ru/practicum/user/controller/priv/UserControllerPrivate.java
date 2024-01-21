@@ -18,12 +18,11 @@ import java.util.List;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users/{userId}/subscribers")
 public class UserControllerPrivate {
 
     private final UserService userService;
 
-    @PostMapping(path = "/{subscriberId}")
+    @PostMapping(path = "/users/{userId}/subscribers/{subscriberId}")
     @ResponseStatus(HttpStatus.CREATED)
     public UserWithSubscribersDto addSubscriber(@PathVariable Long userId,
                                                 @PathVariable Long subscriberId) {
@@ -32,7 +31,7 @@ public class UserControllerPrivate {
         return userService.addSubscriber(userId, subscriberId);
     }
 
-    @DeleteMapping(path = "/{subscriberId}")
+    @DeleteMapping(path = "/users/{userId}/subscribers/{subscriberId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteSubscriber(@PathVariable Long userId,
                                  @PathVariable Long subscriberId) {
@@ -41,7 +40,7 @@ public class UserControllerPrivate {
         userService.deleteSubscriber(userId, subscriberId);
     }
 
-    @GetMapping
+    @GetMapping(path = "/users/{userId}/subscribers")
     public List<UserOutDto> getSubscribers(@PathVariable Long userId,
                                            @RequestParam(required = false) List<Long> ids,
                                       @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer from,
@@ -50,4 +49,14 @@ public class UserControllerPrivate {
                 "userId = %s, ids=%s, начиная с %s, по %s на странице", userId, ids, from, size));
         return userService.getSubscribers(userId, ids, from, size);
     }
+    @GetMapping(path = "/users/{userId}/subscriptions")
+    public List<UserOutDto> getSubscriptions(@PathVariable Long userId,
+                                           @RequestParam(required = false) List<Long> ids,
+                                           @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer from,
+                                           @Positive @RequestParam(required = false, defaultValue = "10") Integer size) {
+        log.info(String.format("Получен запрос GET /users/{userId}/subscriptions с параметрами " +
+                "userId = %s, ids=%s, начиная с %s, по %s на странице", userId, ids, from, size));
+        return userService.getSubscriptions(userId, ids, from, size);
+    }
+
 }

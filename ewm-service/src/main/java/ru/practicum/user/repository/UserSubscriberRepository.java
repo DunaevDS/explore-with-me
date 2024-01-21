@@ -13,4 +13,6 @@ public interface UserSubscriberRepository extends JpaRepository<UserSubscriber, 
     List<UserSubscriber> findByUserId(Long userId);
 
     List<UserSubscriber> findAllByUserId(Long userId, Pageable pageable);
+
+    List<UserSubscriber> findAllBySubscriberId(Long userId, Pageable pageable);
 }

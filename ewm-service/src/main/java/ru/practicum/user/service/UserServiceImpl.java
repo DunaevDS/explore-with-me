@@ -137,11 +137,35 @@ public class UserServiceImpl implements UserService {
         } else {
             users = userSubscriberRepository.findAllByUserId(userId, pageRequest)
                     .stream()
-                    .filter(userSubscriber -> ids.contains(userSubscriber.getSubscriber().getId()))
+                    .filter(userSubscriber -> ids.contains(userSubscriber.getUser().getId()))
                     .collect(Collectors.toList());
             log.info("users = " + users);
         }
         var dto = UserMapper.toOutDtosSubs(users);
+        log.info("dto = " + dto);
+        return dto;
+    }
+
+    @Override
+    public List<UserOutDto> getSubscriptions(Long userId, List<Long> ids, Integer from, Integer size) {
+        log.info("метод getSubscriptions");
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с id = " + userId + " не найден"));
+        log.info("user = " + user);
+
+        List<UserSubscriber> users;
+        Pageable pageRequest = PageRequest.of(from / size, size);
+        if (ids == null || ids.isEmpty()) {
+            users = userSubscriberRepository.findAllBySubscriberId(userId, pageRequest);
+            log.info("users = " + users);
+        } else {
+            users = userSubscriberRepository.findAllBySubscriberId(userId, pageRequest)
+                    .stream()
+                    .filter(userSubscriber -> ids.contains(userSubscriber.getUser().getId()))
+                    .collect(Collectors.toList());
+            log.info("users = " + users);
+        }
+        var dto = UserMapper.toOutDtosSubscriptions(users);
         log.info("dto = " + dto);
         return dto;
     }

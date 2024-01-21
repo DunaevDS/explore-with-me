@@ -21,5 +21,7 @@ public interface UserService {
 
     void deleteSubscriber(Long userId, Long subscriberId);
 
-    List<UserOutDto> getSubscribers(Long userId, List<Long> ids,  Integer from, Integer size);
+    List<UserOutDto> getSubscribers(Long userId, List<Long> ids, Integer from, Integer size);
+
+    List<UserOutDto> getSubscriptions(Long userId, List<Long> ids, Integer from, Integer size);
 }

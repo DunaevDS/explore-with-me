@@ -51,6 +51,15 @@ public class UserMapper {
         return dtos;
     }
 
+    public static List<UserOutDto> toOutDtosSubscriptions(List<UserSubscriber> users) {
+        List<UserOutDto> dtos = new ArrayList<>();
+        for (UserSubscriber user : users) {
+            log.info("user из UserSubscriber = " + user);
+            dtos.add(toUserOutDtoSubs(user.getUser()));
+        }
+        return dtos;
+    }
+
     public static UserShortDto toUserShortDto(User user) {
         return new UserShortDto(user.getId(), user.getName());
     }
