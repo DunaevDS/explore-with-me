@@ -49,7 +49,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> findEventsOfUser(Long userId, Integer from, Integer size) {
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с id" + userId + "не найден"));
         Pageable pageable = PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "id"));
         List<Event> events = eventRepository.findByInitiatorId(userId, pageable).getContent();
@@ -85,7 +85,7 @@ public class EventServiceImpl implements EventService {
     @Transactional
     @Override
     public EventFullDto userUpdateEvent(Long userId, Long eventId, UpdateEventUserRequest eventUpdate) {
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с id" + userId + "не найден"));
         Event oldEvent = findEventByIdAndInitiatorId(userId, eventId);
 
@@ -272,9 +272,9 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<ParticipationRequestDto> findUserEventRequests(Long userId, Long eventId) {
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с id" + userId + "не найден"));
-        Event event = findEventById(eventId);
+        findEventById(eventId);
         List<Request> eventRequests = requestRepository.findAllByEventId(eventId);
         log.info("Выполнен поиск заявок на участие в событии с id {} пользователя {}", eventId, userId);
         return RequestMapper.toDtos(eventRequests);
@@ -285,7 +285,7 @@ public class EventServiceImpl implements EventService {
     public EventRequestStatusUpdateResult changeEventRequestsStatus(Long userId, Long eventId,
                                                                     EventRequestStatusUpdateRequest statusUpdate) {
         int requestsCount = statusUpdate.getRequestIds().size();
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с id" + userId + "не найден"));
         Event event = findEventById(eventId);
         List<Request> confirmed = new ArrayList<>();
